@@ -41,14 +41,13 @@ export default function SignupPage() {
         if (success) {
           toast.success("Account created! Welcome back to Core Sentinel.");
           navigate("/2fa");
-        } else {
-          setError("Failed to create account. Email might already be in use.");
         }
-      } catch {
-        setError("An unexpected error occurred. Please try again.");
+      } catch (err: any) {
+        setError(err.response?.data?.message || err.displayMessage || "Failed to create account. Please try again.");
       } finally {
         setLoading(false);
       }
+
     },
     [name, email, password, confirmPassword, signup, navigate]
   );

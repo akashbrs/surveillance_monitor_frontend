@@ -1,9 +1,10 @@
 import axios from "axios";
+import { API_BASE_URL } from "@/api";
 
 // Central Axios instance — all requests flow through here
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://127.0.0.1:8008/api/",
-  timeout: 10000,
+  baseURL: API_BASE_URL,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -21,19 +22,30 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor — handle 401 globally
+// Response interceptor — handle 401 globally and format errors
 API.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Session expired or unauthorized
     if (error.response?.status === 401) {
       localStorage.removeItem("coresentinel_token");
       localStorage.removeItem("coresentinel_user");
-      if (window.location.pathname !== "/" && window.location.pathname !== "/signup") {
+      localStorage.removeItem("coresentinel_2fa_verified");
+      
+      // Only redirect if not on public pages
+      const publicPaths = ["/", "/signup", "/forgot-password"];
+      if (!publicPaths.includes(window.location.pathname)) {
         window.location.href = "/";
       }
     }
+
+    // Extract message from response if available
+    const errorMessage = error.response?.data?.message || error.message || "An unexpected error occurred";
+    error.displayMessage = errorMessage;
+
     return Promise.reject(error);
   }
 );
 
 export default API;
+

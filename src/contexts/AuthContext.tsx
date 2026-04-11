@@ -93,10 +93,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(data.user);
       set2FAVerified(false);
       return true;
-    } catch {
-      return false;
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.displayMessage || "Login failed";
+      toast.error(msg);
+      throw err;
     }
-  }, []);
+  }, [set2FAVerified]);
 
   const signup = useCallback(async (email: string, password: string, name: string): Promise<boolean> => {
     try {
@@ -107,10 +109,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(data.user);
       set2FAVerified(false);
       return true;
-    } catch {
-      return false;
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.displayMessage || "Signup failed";
+      toast.error(msg);
+      throw err;
     }
-  }, []);
+  }, [set2FAVerified]);
 
   const loginWithGoogle = useCallback(async (googleToken: string): Promise<boolean> => {
     try {
@@ -121,10 +125,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(data.user);
       set2FAVerified(false);
       return true;
-    } catch {
-      return false;
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.displayMessage || "Google login failed";
+      toast.error(msg);
+      throw err;
     }
-  }, []);
+  }, [set2FAVerified]);
 
   // logout() — clears session and redirects to login
   const logout = useCallback(() => {
@@ -141,6 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIs2FAVerifiedState(false);
     toast.info("Logged out successfully.");
   }, []);
+
 
   return (
     <AuthContext.Provider value={{ user, token, loading, is2FAVerified, login, signup, loginWithGoogle, logout, set2FAVerified }}>

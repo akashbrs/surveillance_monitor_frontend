@@ -50,14 +50,13 @@ export default function LoginPage() {
         if (success) {
           toast.success("Welcome back to Core Sentinel.");
           navigate("/2fa");
-        } else {
-          setError("Invalid credentials. Please try again.");
         }
-      } catch {
-        setError("An unexpected error occurred. Please try again.");
+      } catch (err: any) {
+        setError(err.response?.data?.message || err.displayMessage || "Invalid credentials. Please try again.");
       } finally {
         setLoading(false);
       }
+
     },
     [email, password, login, navigate]
   );
